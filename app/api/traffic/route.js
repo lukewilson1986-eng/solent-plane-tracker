@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 
+// OpenSky's servers time out connections from Vercel's standard
+// (AWS-based) serverless network, but respond fine over the Edge
+// network, so this route runs on the edge instead.
+export const runtime = "edge";
+
 // Solent Airport Daedalus (EGHF), Lee-on-Solent — official ARP.
 const AIRPORT = { lat: 50.8156, lon: -1.2067 };
 
