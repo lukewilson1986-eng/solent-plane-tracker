@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 
 const POLL_MS = 20000;
 
+function PlaneIcon() {
+  return (
+    <svg className="logo-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 16.2v-1.5l-7-4.4V4.8c0-.83-.67-1.5-1.5-1.5S11 3.97 11 4.8v5.5l-7 4.4v1.5l7-2.2v5.1l-2.6 1.7v1.4l3.6-1 3.6 1v-1.4L13 19.1v-5.1l8 2.2z" />
+    </svg>
+  );
+}
+
 function formatTime(iso) {
   if (!iso) return "";
   try {
@@ -53,7 +61,10 @@ export default function Home() {
   return (
     <main className="page">
       <div className="header">
-        <h1>Solent Daedalus</h1>
+        <div className="header-title">
+          <PlaneIcon />
+          <h1>Solent Daedalus</h1>
+        </div>
         <p>Lee-on-Solent · what's queued right now</p>
       </div>
 
