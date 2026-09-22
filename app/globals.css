@@ -111,9 +111,9 @@ body {
 }
 
 .section-label {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  margin: 0 0 10px;
+  margin: 0 0 4px;
 }
 
 .section-label.landing {
@@ -124,10 +124,17 @@ body {
   color: var(--teal);
 }
 
+.legend {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--slate);
+  line-height: 1.4;
+}
+
 .rows {
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -135,9 +142,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 13px 16px;
+  padding: 16px 18px;
   border-bottom: 1px solid var(--line);
-  gap: 12px;
+  gap: 14px;
 }
 
 .row:last-child {
@@ -147,19 +154,26 @@ body {
 .row-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
 .callsign {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
+}
+
+.aircraft-type {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--slate);
 }
 
 .row-detail {
   font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--slate);
   white-space: nowrap;
   overflow: hidden;

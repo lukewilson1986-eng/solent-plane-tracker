@@ -12,6 +12,13 @@ function PlaneIcon() {
   );
 }
 
+function typeLine(a) {
+  if (a.category && a.aircraftType) return `${a.category} · ${a.aircraftType}`;
+  if (a.category) return a.category;
+  if (a.aircraftType) return a.aircraftType;
+  return null;
+}
+
 function formatTime(iso) {
   if (!iso) return "";
   try {
@@ -80,6 +87,10 @@ export default function Home() {
       <div className="board">
         <div className="landing">
           <p className="section-label landing">Landing soon</p>
+          <p className="legend">
+            altitude (ft) · distance from field (nm) · speed (kt) · estimated
+            time to landing
+          </p>
           {landing.length === 0 ? (
             <div className="empty-state">
               Nothing inbound right now — you've got a bit of a wait.
@@ -90,6 +101,9 @@ export default function Home() {
                 <div className="row" key={`${a.callsign}-in`}>
                   <div className="row-main">
                     <span className="callsign">{a.callsign}</span>
+                    {typeLine(a) && (
+                      <span className="aircraft-type">{typeLine(a)}</span>
+                    )}
                     <span className="row-detail">
                       {a.altitudeFt} ft · {a.distanceNm} nm · {a.speedKt} kt
                     </span>
@@ -106,6 +120,10 @@ export default function Home() {
 
         <div className="departing">
           <p className="section-label departing">Just departed</p>
+          <p className="legend">
+            distance from field (nm) · speed (kt) · climb rate (fpm) ·
+            altitude now (ft)
+          </p>
           {departing.length === 0 ? (
             <div className="empty-state">
               Nothing's climbed out recently.
@@ -116,6 +134,9 @@ export default function Home() {
                 <div className="row" key={`${a.callsign}-out`}>
                   <div className="row-main">
                     <span className="callsign">{a.callsign}</span>
+                    {typeLine(a) && (
+                      <span className="aircraft-type">{typeLine(a)}</span>
+                    )}
                     <span className="row-detail">
                       {a.distanceNm} nm · {a.speedKt} kt ·{" "}
                       {a.verticalFpm > 0 ? "+" : ""}

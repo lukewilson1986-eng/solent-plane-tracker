@@ -35,6 +35,24 @@ const TRACK_TOLERANCE_DEG = 70;
 
 const POINT_URL = "https://api.adsb.lol/v2/point";
 
+// ADS-B "emitter category" codes (DO-260B), reduced to the ones
+// likely to show up near a small GA field. Aircraft that don't
+// broadcast a category, or send one outside this list, get no label
+// rather than a guessed one.
+const CATEGORY_LABELS = {
+  A1: "Light aircraft",
+  A2: "Small aircraft",
+  A3: "Large aircraft",
+  A4: "Large aircraft",
+  A5: "Heavy aircraft",
+  A6: "High-performance aircraft",
+  A7: "Helicopter",
+  B1: "Glider",
+  B2: "Airship/balloon",
+  B4: "Microlight/paraglider",
+  B6: "Drone",
+};
+
 function toRad(deg) {
   return (deg * Math.PI) / 180;
 }
@@ -75,7 +93,18 @@ function classify(aircraft) {
   const departing = [];
 
   for (const a of aircraft) {
-    const { hex, flight, lat, lon, alt_baro: altBaro, gs, track, baro_rate: baroRate } = a;
+    const {
+      hex,
+      flight,
+      lat,
+      lon,
+      alt_baro: altBaro,
+      gs,
+      track,
+      baro_rate: baroRate,
+      t: typeCode,
+      category: categoryCode,
+    } = a;
 
     if (
       typeof altBaro !== "number" ||
@@ -97,6 +126,8 @@ function classify(aircraft) {
     const distanceNmRounded = Math.round(dNm * 10) / 10;
     const speedKt = Math.round(gs);
     const verticalFpm = Math.round(baroRate);
+    const category = CATEGORY_LABELS[categoryCode] || null;
+    const aircraftType = typeCode || null;
 
     if (baroRate <= DESCENT_THRESHOLD_FPM) {
       const bearingToAirport = bearingDeg(lat, lon, AIRPORT.lat, AIRPORT.lon);
@@ -113,6 +144,8 @@ function classify(aircraft) {
           speedKt,
           verticalFpm,
           etaMin,
+          category,
+          aircraftType,
         });
       }
     } else if (baroRate >= CLIMB_THRESHOLD_FPM) {
@@ -129,6 +162,8 @@ function classify(aircraft) {
           distanceNm: distanceNmRounded,
           speedKt,
           verticalFpm,
+          category,
+          aircraftType,
         });
       }
     }
