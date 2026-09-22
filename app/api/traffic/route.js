@@ -33,6 +33,14 @@ const DESCENT_THRESHOLD_FPM = -100;
 // bearing to/from the airport to count as heading there, in degrees.
 const TRACK_TOLERANCE_DEG = 70;
 
+// Ground movements only happen right at the field, so this is much
+// tighter than MAX_DISTANCE_NM.
+const GROUND_MAX_DISTANCE_NM = 1;
+
+// Ground speed below this is treated as parked (GPS jitter, engine
+// warm-up) rather than actually taxiing.
+const TAXI_MIN_GS_KT = 2;
+
 const POINT_URL = "https://api.adsb.lol/v2/point";
 
 // ADS-B "emitter category" codes (DO-260B), reduced to the ones
@@ -91,6 +99,7 @@ function angleDiff(a, b) {
 function classify(aircraft) {
   const landing = [];
   const departing = [];
+  const onGround = [];
 
   for (const a of aircraft) {
     const {
@@ -101,33 +110,45 @@ function classify(aircraft) {
       alt_baro: altBaro,
       gs,
       track,
+      true_heading: trueHeading,
       baro_rate: baroRate,
       t: typeCode,
       category: categoryCode,
     } = a;
 
-    if (
-      typeof altBaro !== "number" ||
-      lat == null ||
-      lon == null ||
-      gs == null ||
-      track == null ||
-      baroRate == null
-    ) {
+    if (lat == null || lon == null || gs == null) continue;
+
+    const dNm = distanceNm(AIRPORT.lat, AIRPORT.lon, lat, lon);
+    const callsign = (flight || "").trim() || hex.toUpperCase();
+    const category = CATEGORY_LABELS[categoryCode] || null;
+    const aircraftType = typeCode || null;
+
+    if (altBaro === "ground") {
+      if (dNm <= GROUND_MAX_DISTANCE_NM && gs >= TAXI_MIN_GS_KT) {
+        const heading = track ?? trueHeading;
+        onGround.push({
+          callsign,
+          speedKt: Math.round(gs),
+          headingDeg: heading != null ? Math.round(heading) % 360 : null,
+          category,
+          aircraftType,
+          distanceNm: Math.round(dNm * 10) / 10,
+        });
+      }
       continue;
     }
 
-    const dNm = distanceNm(AIRPORT.lat, AIRPORT.lon, lat, lon);
+    if (typeof altBaro !== "number" || track == null || baroRate == null) {
+      continue;
+    }
+
     if (dNm > MAX_DISTANCE_NM) continue;
     if (altBaro > MAX_ALTITUDE_FT) continue;
 
-    const callsign = (flight || "").trim() || hex.toUpperCase();
     const altitudeFt = Math.round(altBaro);
     const distanceNmRounded = Math.round(dNm * 10) / 10;
     const speedKt = Math.round(gs);
     const verticalFpm = Math.round(baroRate);
-    const category = CATEGORY_LABELS[categoryCode] || null;
-    const aircraftType = typeCode || null;
 
     if (baroRate <= DESCENT_THRESHOLD_FPM) {
       const bearingToAirport = bearingDeg(lat, lon, AIRPORT.lat, AIRPORT.lon);
@@ -171,8 +192,9 @@ function classify(aircraft) {
 
   landing.sort((a, b) => (a.etaMin ?? 999) - (b.etaMin ?? 999));
   departing.sort((a, b) => a.altitudeFt - b.altitudeFt);
+  onGround.sort((a, b) => a.distanceNm - b.distanceNm);
 
-  return { landing, departing };
+  return { landing, departing, onGround };
 }
 
 export async function GET() {
@@ -193,12 +215,13 @@ export async function GET() {
     }
 
     const data = await res.json();
-    const { landing, departing } = classify(data.ac || []);
+    const { landing, departing, onGround } = classify(data.ac || []);
 
     return NextResponse.json({
       updated: new Date().toISOString(),
       landing,
       departing,
+      onGround,
     });
   } catch (err) {
     console.error("traffic route failed:", err);

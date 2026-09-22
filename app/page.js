@@ -64,6 +64,7 @@ export default function Home() {
 
   const landing = data?.landing ?? [];
   const departing = data?.departing ?? [];
+  const onGround = data?.onGround ?? [];
 
   return (
     <main className="page">
@@ -151,12 +152,49 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        <div className="onground">
+          <p className="section-label onground">On the ground</p>
+          <p className="legend">ground speed (kt) · heading (°)</p>
+          {onGround.length === 0 ? (
+            <div className="empty-state">Nothing taxiing right now.</div>
+          ) : (
+            <div className="rows">
+              {onGround.map((a) => (
+                <div className="row" key={`${a.callsign}-gnd`}>
+                  <div className="row-main">
+                    <span className="callsign">{a.callsign}</span>
+                    {typeLine(a) && (
+                      <span className="aircraft-type">{typeLine(a)}</span>
+                    )}
+                    {a.headingDeg != null && (
+                      <span className="row-detail">hdg {a.headingDeg}°</span>
+                    )}
+                  </div>
+                  <div className="row-readout">
+                    {a.speedKt} kt<small>ground spd</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <p className="footnote">
         Built from public ADS-B data, refreshed every 20 seconds. Not every
         aircraft broadcasts a position — some smaller types and gliders may
         not appear. Not for navigation.
+      </p>
+
+      <p className="credit">
+        Built by Luke Wilson, a Lee-on-Solent resident. Free to use. Feedback,
+        issues or update requests to{" "}
+        <a href="mailto:solentairporttracker@gmail.com">
+          solentairporttracker@gmail.com
+        </a>
+        . Interested in advertising on this site? Get in touch at the same
+        address.
       </p>
     </main>
   );

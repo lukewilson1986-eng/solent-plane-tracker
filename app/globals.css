@@ -8,6 +8,7 @@
   --line: #c7d9e3;
   --amber: #e2812a;
   --teal: #1e7a67;
+  --stone: #8a7355;
   --paper: #ffffff;
   color-scheme: light;
 }
@@ -124,6 +125,10 @@ body {
   color: var(--teal);
 }
 
+.section-label.onground {
+  color: var(--stone);
+}
+
 .legend {
   margin: 0 0 12px;
   font-size: 12px;
@@ -205,6 +210,10 @@ body {
   color: var(--teal);
 }
 
+.onground .row-readout {
+  color: var(--stone);
+}
+
 .empty-state {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -229,6 +238,19 @@ body {
   font-size: 12px;
   color: var(--slate);
   line-height: 1.5;
+}
+
+.credit {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--slate);
+  line-height: 1.5;
+}
+
+.credit a {
+  color: var(--teal);
 }
 
 @media (min-width: 700px) {
