@@ -216,6 +216,7 @@ export async function GET() {
       departing,
     });
   } catch (err) {
+    console.error("traffic route failed:", err);
     return NextResponse.json(
       { error: err.message || "Something went wrong." },
       { status: 500 }
