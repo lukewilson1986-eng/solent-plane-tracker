@@ -29,5 +29,8 @@ export async function GET() {
     "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token",
     { method: "POST" }
   );
-  return NextResponse.json({ anonymousStates, authToken });
+  const adsbLol = await check(
+    "https://api.adsb.lol/v2/point/50.8156/-1.2067/15"
+  );
+  return NextResponse.json({ anonymousStates, authToken, adsbLol });
 }
